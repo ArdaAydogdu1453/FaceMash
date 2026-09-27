@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --asb-ink:        #12131a;
+  --asb-surface:    #1b1d26;
+  --asb-surface-2:  #242733;
+  --asb-text:       #f2f3f6;
+  --asb-text-dim:   #9a9db0;
+  --asb-gold:       #e8a93c;
+  --asb-crimson:    #e23d45;
+  --asb-mint:       #2fb893;
+  --asb-font-display: 'Space Grotesk', system-ui, sans-serif;
+  --asb-font-body:    'Inter', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--asb-font-body);
+  background-color: var(--asb-ink);
+  color: var(--asb-text);
+  margin: 0;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-family: var(--asb-font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--asb-text);
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+main {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Nav Pills (Dark Glassmorphic) */
+.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--asb-surface);
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--asb-surface-2);
+  margin-top: 2.5rem;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: var(--asb-text-dim);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.main-nav a:hover {
+  color: var(--asb-text);
+  background: var(--asb-surface-2);
+}
+
+.main-nav a.active {
+  color: var(--asb-gold);
+  background: rgba(232, 169, 60, 0.12);
+  border: 1px solid rgba(232, 169, 60, 0.25);
+  font-weight: 700;
+}
+
+footer {
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  font-size: 0.85rem;
+  color: var(--asb-text-dim);
+  text-align: center;
+}
+
+/* Global Dark Overrides for Admin & Upload components */
+.stat-card, .upload-container, .table-container, .admin-box {
+  background: var(--asb-surface) !important;
+  border: 1px solid var(--asb-surface-2) !important;
+  color: var(--asb-text) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4) !important;
+}
+
+.stat-label, .drop-sub, .form-group label {
+  color: var(--asb-text-dim) !important;
+}
+
+.stat-value, .drop-title {
+  color: var(--asb-text) !important;
+}
+
+.drop-zone {
+  background: var(--asb-surface-2) !important;
+  border: 2px dashed rgba(232, 169, 60, 0.4) !important;
+  color: var(--asb-text) !important;
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--asb-gold) !important;
+  background: #2a2e3d !important;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  body {
+    padding: 1.5rem 0.75rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .main-nav {
+    border-radius: 16px;
+    padding: 0.5rem;
+  }
+}

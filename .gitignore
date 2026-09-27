@@ -1,0 +1,20 @@
+# Operating System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# IDE & Editor Configurations
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Local Environment Configuration (CRITICAL: NEVER COMMIT REAL PASSWORDS)
+config.php
+
+# Temporary & Log files
+*.log
+*.tmp
+*.zip
