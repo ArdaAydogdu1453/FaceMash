@@ -117,7 +117,7 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="asb-csrf" content="<?= htmlspecialchars($_SESSION['asb']['csrf'] ?? '') ?>">
-  <title>FaceMash — Karşılaştırma Arenası</title>
+  <title>FaceMash — Comparison Arena</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -164,10 +164,19 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
       color: var(--asb-text-dim);
     }
     .asb-gpu-badge {
-      max-width: 260px;
+      max-width: 180px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    @media (max-width: 480px) {
+      .asb-gpu-badge {
+        max-width: 120px;
+      }
+      .asb-player-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.6rem;
+      }
     }
     .player-dot {
       width: 7px;
@@ -347,13 +356,21 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
     .pillar-rank.gold-rank { background: var(--asb-gold); color: var(--asb-ink); box-shadow: 0 0 12px rgba(232,169,60,0.55); }
     @media (max-width: 640px) {
       .asb-card {
-        height: clamp(180px, 32vh, 240px);
+        height: clamp(160px, 28vh, 220px);
       }
       .asb-arena {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 0.5rem;
       }
-      .asb-vs { order: 2; margin: 0 auto; width: 30px; height: 30px; font-size: 0.8rem; }
+      .asb-vs { 
+        width: 32px; 
+        height: 32px; 
+        font-size: 0.75rem; 
+      }
+      .asb-card__name {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.6rem;
+      }
     }
   </style>
 </head>
@@ -362,14 +379,14 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
 <div class="asb-top-meta">
   <div class="asb-meta-left">
     <div class="asb-player-badge">
-      <span class="player-dot"></span> Oyuncu #<?= $playerTag ?>
+      <span class="player-dot"></span> Player #<?= $playerTag ?>
     </div>
-    <div class="asb-gpu-badge" id="asbGpuBadge" title="Donanım Doğrulaması">
+    <div class="asb-gpu-badge" id="asbGpuBadge" title="Hardware Verification">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
-      <span id="asbGpuName">Donanım Taranıyor...</span>
+      <span id="asbGpuName">Scanning Hardware...</span>
     </div>
   </div>
-  <button type="button" class="asb-sound-btn" id="asbSoundToggle" title="Ses Aç/Kapat">
+  <button type="button" class="asb-sound-btn" id="asbSoundToggle" title="Toggle Sound">
     <svg id="svgSoundOn" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
     <svg id="svgSoundOff" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
   </button>
@@ -381,7 +398,7 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
   <div class="asb-tracker" id="asbTracker">
     <?php if ($isCompleted): ?>
       <div class="asb-tracker__label" style="justify-content:center; color:var(--asb-gold);">
-        <span style="display:inline-flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Turnuva Tamamlandı — Şampiyonlar Podyumu</span>
+        <span style="display:inline-flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Tournament Complete — Champions Podium</span>
       </div>
       <div class="asb-tracker__ticks">
         <?php for ($i = 1; $i <= ASB_TARGET_STEPS; $i++): ?>
@@ -391,9 +408,9 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
     <?php else: ?>
       <div class="asb-tracker__label">
         <span class="asb-round-badge">
-          Karşılaştırma <strong id="asbStepNum"><?= min($displayStep, ASB_TARGET_STEPS) ?></strong> / <?= ASB_TARGET_STEPS ?>
+          Comparison <strong id="asbStepNum"><?= min($displayStep, ASB_TARGET_STEPS) ?></strong> / <?= ASB_TARGET_STEPS ?>
         </span>
-        <span style="font-size: 0.78rem; color: var(--asb-mint);">Turnuva Seansı</span>
+        <span style="font-size: 0.78rem; color: var(--asb-mint);">Tournament Session</span>
       </div>
       <div class="asb-tracker__ticks" id="asbTicks">
         <?php for ($i = 1; $i <= ASB_TARGET_STEPS; $i++): ?>
@@ -412,8 +429,8 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
       <!-- Arena İçinde Doğrudan Şampiyonluk Podyumu (karşılaştırma kartlarının YERİNE gelir) -->
       <?php if (!empty($podium)): ?>
       <div class="asb-podium-head">
-        <div class="asb-podium-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:8px;color:var(--asb-gold);"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Seans Tamamlandı!</div>
-        <div class="asb-podium-sub">Bu <?= ASB_TARGET_STEPS ?> adımlık turnuvadaki kişisel podyumun:</div>
+        <div class="asb-podium-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:8px;color:var(--asb-gold);"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Session Complete!</div>
+        <div class="asb-podium-sub">Your personal podium from this <?= ASB_TARGET_STEPS ?>-step tournament:</div>
       </div>
       <div class="asb-tier-podium asb-pop-in">
         <?php if (isset($podium[1])): ?>
@@ -458,7 +475,7 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
       <?php else: ?>
       <!-- Asla boş kalmasın: veri yoksa bile aksiyonlar göster -->
       <div class="asb-podium-head">
-        <div class="asb-podium-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:8px;color:var(--asb-gold);"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Seans Tamamlandı!</div>
+        <div class="asb-podium-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:8px;color:var(--asb-gold);"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Session Complete!</div>
         <div class="asb-podium-sub">Podyum verisi yüklenemedi, ama yeni turnuva hemen başlayabilir.</div>
       </div>
       <?php endif; ?>
@@ -466,15 +483,15 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
       <div class="asb-podium-actions">
         <a href="index.php?reset=1" class="asb-btn asb-btn--primary">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-          Yeni Turnuva Başlat
+          Start New Tournament
         </a>
         <button type="button" id="asbShareBtn" class="asb-btn asb-btn--share">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-          Sonuçları Kopyala
+          Copy Results
         </button>
-        <a href="leaderboard.php" class="asb-btn">Liderlik Tablosu</a>
+        <a href="leaderboard.php" class="asb-btn">Leaderboard</a>
       </div>
-      <div id="asbToast" class="asb-toast" hidden>Sonuçlar panoya kopyalandı!</div>
+      <div id="asbToast" class="asb-toast" hidden>Results copied to clipboard!</div>
 
     <?php elseif ($matchup): ?>
       <?php if (!empty($matchup['is_close_battle'])): ?>
@@ -484,7 +501,7 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
         </div>
       <?php endif; ?>
 
-      <button class="asb-card" id="asbCardA" data-side="a" type="button" title="Seçmek için tıkla [ ← ]">
+      <button class="asb-card" id="asbCardA" data-side="a" type="button" title="Click to select [ ← ]">
         <div class="asb-card__name" id="asbNameA"><?= htmlspecialchars($matchup['photo_a']['name']) ?></div>
         <img src="assets/photos/<?= htmlspecialchars($matchup['photo_a']['filename']) ?>" alt="<?= htmlspecialchars($matchup['photo_a']['name']) ?>">
         <span class="asb-card__reveal" id="asbRevealA"></span>
@@ -492,7 +509,7 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
 
       <div class="asb-vs">VS</div>
 
-      <button class="asb-card" id="asbCardB" data-side="b" type="button" title="Seçmek için tıkla [ → ]">
+      <button class="asb-card" id="asbCardB" data-side="b" type="button" title="Click to select [ → ]">
         <div class="asb-card__name" id="asbNameB"><?= htmlspecialchars($matchup['photo_b']['name']) ?></div>
         <img src="assets/photos/<?= htmlspecialchars($matchup['photo_b']['filename']) ?>" alt="<?= htmlspecialchars($matchup['photo_b']['name']) ?>">
         <span class="asb-card__reveal" id="asbRevealB"></span>
@@ -500,16 +517,16 @@ $displayStep = (int)$_SESSION['asb']['step'] + 1;
 
     <?php else: ?>
       <div style="text-align:center; padding: 2rem; grid-column: 1 / -1;">
-        <h2 style="font-family: var(--asb-font-display);">Henüz Karşılaştırma Yok</h2>
-        <p style="color: var(--asb-text-dim);">Lütfen admin panelinden en az 2 fotoğraf yükleyiniz.</p>
-        <a href="upload.php" class="asb-btn asb-btn--primary" style="margin-top:1rem;">Fotoğraf Yükle</a>
+        <h2 style="font-family: var(--asb-font-display);">No Comparisons Yet</h2>
+        <p style="color: var(--asb-text-dim);">Please upload at least 2 photos from the admin panel.</p>
+        <a href="upload.php" class="asb-btn asb-btn--primary" style="margin-top:1rem;">Upload Photos</a>
       </div>
     <?php endif; ?>
 
   </div>
 
   <?php if (!$isCompleted && $matchup): ?>
-    <p class="asb-hint">Seçmek için tıkla veya klavyeden [ ← / → ] kullan</p>
+    <p class="asb-hint">Click to select or use keyboard [ ← / → ]</p>
   <?php endif; ?>
 
 </div>
@@ -750,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tracker) {
             tracker.innerHTML = `
               <div class="asb-tracker__label" style="justify-content:center; color:var(--asb-gold);">
-                <span style="display:inline-flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Turnuva Tamamlandı — Şampiyonlar Podyumu</span>
+                <span style="display:inline-flex;align-items:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Tournament Complete — Champions Podium</span>
               </div>
               <div class="asb-tracker__ticks">
                 ${Array(15).fill('<span class="asb-tick is-done"></span>').join('')}
@@ -773,8 +790,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = `
         <div class="asb-podium-head">
-          <div class="asb-podium-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:8px;color:var(--asb-gold);"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Seans Tamamlandı!</div>
-          <div class="asb-podium-sub">Bu 15 adımlık turnuvadaki kişisel podyumun:</div>
+          <div class="asb-podium-title"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-4px;margin-right:8px;color:var(--asb-gold);"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Session Complete!</div>
+          <div class="asb-podium-sub">Your personal podium from this 15-step tournament:</div>
         </div>
         <div class="asb-tier-podium asb-pop-in">`;
         if (silver && silver.filename) {
@@ -822,15 +839,15 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="asb-podium-actions">
           <a href="index.php?reset=1" class="asb-btn asb-btn--primary">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
-            Yeni Turnuva Başlat
+            Start New Tournament
           </a>
           <button type="button" id="asbShareBtn" class="asb-btn asb-btn--share">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            Sonuçları Kopyala
+            Copy Results
           </button>
-          <a href="leaderboard.php" class="asb-btn">Liderlik Tablosu</a>
+          <a href="leaderboard.php" class="asb-btn">Leaderboard</a>
         </div>
-        <div id="asbToast" class="asb-toast" hidden>Sonuçlar panoya kopyalandı!</div>`;
+        <div id="asbToast" class="asb-toast" hidden>Results copied to clipboard!</div>`;
 
         if (arena) {
             arena.style.display = 'block';

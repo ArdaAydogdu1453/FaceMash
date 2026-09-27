@@ -48,7 +48,7 @@ $result = $conn->query("SELECT * FROM photos ORDER BY rating DESC, wins DESC, id
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FaceMash — Yönetim Paneli</title>
+  <title>FaceMash — Admin Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -238,48 +238,111 @@ $result = $conn->query("SELECT * FROM photos ORDER BY rating DESC, wins DESC, id
       color: var(--asb-gold);
       font-size: 1.05rem;
     }
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+      .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      .toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .toolbar-actions {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+      .btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 120px;
+      }
+      th, td {
+        padding: 0.6rem 0.5rem;
+        font-size: 0.85rem;
+      }
+      .thumb {
+        width: 36px;
+        height: 36px;
+      }
+      .candidate-title {
+        font-size: 0.85rem;
+      }
+      .candidate-file {
+        font-size: 0.7rem;
+      }
+      .elo-val {
+        font-size: 0.95rem;
+      }
+      th:nth-child(6), 
+      td:nth-child(6),
+      th:nth-child(7), 
+      td:nth-child(7) {
+        display: none;
+      }
+    }
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .stat-val {
+        font-size: 1.8rem;
+      }
+      .panel-card {
+        padding: 1.25rem;
+        border-radius: 12px;
+      }
+      th:nth-child(2), 
+      td:nth-child(2) {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body class="asb-body">
 
 <div class="admin-wrapper">
   <div class="admin-header">
-    <h1>Yönetim Kontrol Paneli</h1>
+    <h1>Admin Control Panel</h1>
     <a href="logout.php" class="btn btn-danger">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-      Güvenli Çıkış
+      Logout
     </a>
   </div>
 
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="stat-label">Toplam Görsel</div>
+      <div class="stat-label">Total Images</div>
       <div class="stat-val"><?= $stats['total_photos'] ?></div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">Toplam Oynanan Maç</div>
+      <div class="stat-label">Total Matches Played</div>
       <div class="stat-val"><?= $stats['total_votes'] ?></div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">En Yüksek Elo</div>
+      <div class="stat-label">Highest Elo</div>
       <div class="stat-val gold"><?= round($stats['max_rating']) ?></div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">En Düşük Elo</div>
+      <div class="stat-label">Lowest Elo</div>
       <div class="stat-val" style="color: var(--asb-text-dim) !important;"><?= round($stats['min_rating']) ?></div>
     </div>
   </div>
 
   <div class="panel-card">
     <div class="toolbar">
-      <h2>Fotoğraf Havuzu ve Performans Sıralaması</h2>
+      <h2>Photo Pool and Performance Ranking</h2>
       <div class="toolbar-actions">
         <a href="upload.php" class="btn btn-upload">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Yeni Görseller Yükle
+          Upload New Images
         </a>
         <form action="reset_ranks.php" method="post" onsubmit="return confirm('Tüm fotoğrafların Elo puanları 1000 olarak sıfırlanacak. Onaylıyor musunuz?');" style="margin: 0;">
-          <button type="submit" class="btn btn-warning">Puanları Sıfırla</button>
+          <button type="submit" class="btn btn-warning">Reset Scores</button>
         </form>
       </div>
     </div>
@@ -290,12 +353,12 @@ $result = $conn->query("SELECT * FROM photos ORDER BY rating DESC, wins DESC, id
           <tr>
             <th style="width: 40px; text-align: center;"><input type="checkbox" id="select-all"></th>
             <th>ID</th>
-            <th>Önizleme</th>
-            <th>Dosya / Görünen İsim</th>
-            <th>Elo Skoru</th>
-            <th>G</th>
-            <th>M</th>
-            <th style="text-align: right;">İşlem</th>
+            <th>Preview</th>
+            <th>File / Display Name</th>
+            <th>Elo Score</th>
+            <th>W</th>
+            <th>L</th>
+            <th style="text-align: right;">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -309,7 +372,7 @@ $result = $conn->query("SELECT * FROM photos ORDER BY rating DESC, wins DESC, id
                 </td>
                 <td style="font-weight: 600; color: var(--asb-text-dim);">#<?= $row['id'] ?></td>
                 <td>
-                  <img class="thumb" src="assets/photos/<?= htmlspecialchars($row['filename']) ?>" alt="Fotoğraf">
+                  <img class="thumb" src="assets/photos/<?= htmlspecialchars($row['filename']) ?>" alt="Photo">
                 </td>
                 <td>
                   <div class="candidate-title"><?= htmlspecialchars(format_display_name($row['filename'])) ?></div>
@@ -344,7 +407,7 @@ $result = $conn->query("SELECT * FROM photos ORDER BY rating DESC, wins DESC, id
 <?php include 'nav.php'; ?>
 
 <footer style="margin-top:2rem; color:var(--asb-text-dim); font-size:0.85rem;">
-  &copy; <?= date('Y') ?> FaceMash — Admin Yönetim Paneli
+  &copy; <?= date('Y') ?> FaceMash — Admin Management Panel
 </footer>
 
 <script>

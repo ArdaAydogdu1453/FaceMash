@@ -27,7 +27,7 @@ if ($result) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FaceMash — Canlı Liderlik Tablosu</title>
+  <title>FaceMash — Live Leaderboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -176,14 +176,50 @@ if ($result) {
     }
     .rank-shift.up { color: var(--asb-mint); }
     .rank-shift.down { color: var(--asb-crimson); }
+
+    /* Mobile responsive improvements */
+    @media (max-width: 640px) {
+      .table-container {
+        border-radius: 12px;
+      }
+      th, td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+      }
+      .photo-thumb {
+        width: 40px;
+        height: 40px;
+      }
+      .rank-badge {
+        width: 26px;
+        height: 26px;
+        font-size: 0.75rem;
+      }
+      .elo-cell {
+        font-size: 0.95rem;
+      }
+      .win-bar {
+        min-width: 40px;
+      }
+      .win-bar-wrap {
+        gap: 6px;
+      }
+      .rank-cell {
+        width: 45px;
+      }
+      th:nth-child(5), 
+      td:nth-child(5) {
+        display: none; /* Hide win rate percentage on mobile */
+      }
+    }
   </style>
 </head>
 <body class="asb-body">
 
 <div class="leaderboard-header">
-  <h1>Canlı Liderlik Tablosu</h1>
+  <h1>Live Leaderboard</h1>
   <div class="live-indicator">
-    <span class="live-dot"></span> Canlı 0 ms WebSocket (Pusher) Aktif
+    <span class="live-dot"></span> Live 0 ms WebSocket (Pusher) Active
   </div>
 </div>
 
@@ -191,17 +227,17 @@ if ($result) {
   <table>
     <thead>
       <tr>
-        <th class="rank-cell">Sıra</th>
-        <th>Görsel</th>
-        <th>İsim</th>
-        <th>Elo Skoru</th>
-        <th>Kazanma Oranı</th>
-        <th>G / M</th>
+        <th class="rank-cell">Rank</th>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Elo Score</th>
+        <th>Win Rate</th>
+        <th>W / L</th>
       </tr>
     </thead>
     <tbody id="leaderboard-tbody">
       <?php if (empty($topPhotos)): ?>
-        <tr><td colspan="6" style="text-align:center; padding: 2.5rem; color:var(--asb-text-dim);">Henüz kayıtlı görsel bulunmamaktadır.</td></tr>
+        <tr><td colspan="6" style="text-align:center; padding: 2.5rem; color:var(--asb-text-dim);">No registered images found yet.</td></tr>
       <?php else: ?>
         <?php foreach ($topPhotos as $index => $photo): ?>
           <?php 
@@ -240,7 +276,7 @@ if ($result) {
 <?php include 'nav.php'; ?>
 
 <footer style="margin-top:2rem; color:var(--asb-text-dim); font-size:0.85rem;">
-  &copy; <?= date('Y') ?> FaceMash — Elo Sıralama Sistemi
+  &copy; <?= date('Y') ?> FaceMash — Elo Ranking System
 </footer>
 
 <script>
@@ -300,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTable(data) {
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2.5rem; color:var(--asb-text-dim);">Henüz kayıtlı görsel bulunmamaktadır.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2.5rem; color:var(--asb-text-dim);">No registered images found yet.</td></tr>';
             return;
         }
 

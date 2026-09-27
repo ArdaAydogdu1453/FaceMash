@@ -3,24 +3,24 @@ session_start();
 require 'config.php';
 require 'matchup_logic.php';
 
-// Güvenlik: Yalnızca yetkili yönetici görsel yükleyebilir
+// Security: Only authorized admin can upload images
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header('Location: login.php');
     exit;
 }
 
-// Dosya adını güvenli ve web dostu hale getiren fonksiyon
+// Function to make filename safe and web-friendly
 function sanitize_filename($rawName) {
     $info = pathinfo($rawName);
     $ext = strtolower($info['extension'] ?? '');
     $base = $info['filename'];
 
-    // Türkçe karakterleri dönüştür
+    // Convert Turkish characters
     $tr = ['ç'=>'c', 'ğ'=>'g', 'ı'=>'i', 'ö'=>'o', 'ş'=>'s', 'ü'=>'u',
            'Ç'=>'c', 'Ğ'=>'g', 'İ'=>'i', 'Ö'=>'o', 'Ş'=>'s', 'Ü'=>'u'];
     $base = strtr($base, $tr);
 
-    // Yalnızca harf, rakam ve tire bırak
+    // Keep only letters, numbers and hyphens
     $base = preg_replace('/[^a-zA-Z0-9]+/', '-', $base);
     $base = trim($base, '-');
     if (empty($base)) {
@@ -54,14 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
         $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
 
         if (!in_array($ext, $allowedExts)) {
-            $errors[] = "$origName: Desteklenmeyen dosya formatı.";
+            $errors[] = "$origName: Unsupported file format.";
             continue;
         }
 
         $safeName = sanitize_filename($origName);
         $destination = $targetDir . $safeName;
 
-        // Dosya adı çakışmasını önle
+        // Prevent filename collision
         if (file_exists($destination)) {
             $baseName = pathinfo($safeName, PATHINFO_FILENAME);
             $safeName = $baseName . '_' . substr(uniqid(), -5) . '.' . $ext;
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
             $stmt->close();
             $uploadedCount++;
         } else {
-            $errors[] = "$origName yüklenemedi.";
+            $errors[] = "$origName could not be uploaded.";
         }
     }
 
@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
         exit;
     }
 
-    $message = "$uploadedCount görsel başarıyla yüklendi.";
+    $message = "$uploadedCount images successfully uploaded.";
 }
 ?>
 <!DOCTYPE html>
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/styles.css">
-  <title>FaceMash — Görsel Yükle</title>
+  <title>FaceMash — Upload Images</title>
   <style>
     /* ASB Dark Upload Theme */
     body.asb-body { align-items: center; justify-content: flex-start; padding-top: 2rem; }
@@ -186,6 +186,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
       overflow: hidden;
       text-overflow: ellipsis;
       text-align: center;
+      line-height: 1.2;
+    }
+    @media (max-width: 480px) {
+      .upload-container {
+        padding: 1.5rem;
+        border-radius: 12px;
+      }
+      .drop-zone {
+        padding: 1.5rem 1rem;
+      }
+      .drop-title {
+        font-size: 0.95rem;
+      }
+      .drop-sub {
+        font-size: 0.75rem;
+      }
+      .preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+        gap: 8px;
+      }
     }
     .progress-bar-wrap {
       margin-top: 1.5rem;
@@ -256,8 +276,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
 </head>
 <body class="asb-body">
 
-<h1 style="font-family: var(--asb-font-display); margin-bottom: 0.25rem;">Görsel Yükle</h1>
-<p style="color: var(--asb-text-dim); margin-top: 0; margin-bottom: 2rem;">Ölçeklenebilir yükleme: Alt veya üst sınır yoktur.</p>
+<h1 style="font-family: var(--asb-font-display); margin-bottom: 0.25rem;">Upload Images</h1>
+<p style="color: var(--asb-text-dim); margin-top: 0; margin-bottom: 2rem;">Scalable upload: No lower or upper limit.</p>
 
 <div class="upload-container">
   <form id="upload-form" action="upload.php" method="post" enctype="multipart/form-data">
@@ -265,8 +285,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
       <div class="drop-icon">
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
       </div>
-      <div class="drop-title">Görselleri buraya sürükleyip bırakın</div>
-      <div class="drop-sub">veya bilgisayarınızdan seçmek için tıklayın</div>
+      <div class="drop-title">Drag and drop images here</div>
+      <div class="drop-sub">or click to select from your computer</div>
       <input type="file" name="photos[]" id="file-input" multiple accept="image/*">
     </div>
 
@@ -281,7 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['photos'])) {
 
     <div class="status-msg" id="status-msg"></div>
 
-    <button type="submit" class="upload-btn" id="submit-btn" disabled>Görselleri Yükle</button>
+    <button type="submit" class="upload-btn" id="submit-btn" disabled>Upload Images</button>
   </form>
 </div>
 
@@ -348,12 +368,12 @@ document.addEventListener('DOMContentLoaded', () => {
         previewGrid.innerHTML = '';
         if (selectedFiles.length === 0) {
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Görselleri Yükle';
+            submitBtn.textContent = 'Upload Images';
             return;
         }
 
         submitBtn.disabled = false;
-        submitBtn.textContent = `${selectedFiles.length} Görseli Yükle`;
+        submitBtn.textContent = `Upload ${selectedFiles.length} Images`;
 
         selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
@@ -398,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.lengthComputable) {
                 const percent = Math.round((e.loaded / e.total) * 100);
                 progressFill.style.width = percent + '%';
-                progressText.textContent = `Yükleniyor: %${percent}`;
+                progressText.textContent = `Uploading: %${percent}`;
             }
         };
 
@@ -411,19 +431,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     const res = JSON.parse(xhr.responseText);
                     if (res.success) {
                         statusMsg.className = 'status-msg status-success';
-                        statusMsg.textContent = `${res.uploaded} görsel başarıyla sisteme aktarıldı ve 1000 Elo skoru ile başlatıldı!`;
+                        statusMsg.textContent = `${res.uploaded} images successfully added to the system and started with 1000 Elo score!`;
                         statusMsg.style.display = 'block';
                         selectedFiles = [];
                         fileInput.value = '';
                         renderPreviews();
                     } else {
                         statusMsg.className = 'status-msg status-error';
-                        statusMsg.textContent = (res.errors && res.errors.length) ? res.errors.join(' ') : 'Yükleme başarısız.';
+                        statusMsg.textContent = (res.errors && res.errors.length) ? res.errors.join(' ') : 'Upload failed.';
                         statusMsg.style.display = 'block';
                     }
                 } catch(err) {
                     statusMsg.className = 'status-msg status-success';
-                    statusMsg.textContent = 'Görseller başarıyla yüklendi!';
+                    statusMsg.textContent = 'Images successfully uploaded!';
                     statusMsg.style.display = 'block';
                     selectedFiles = [];
                     renderPreviews();
